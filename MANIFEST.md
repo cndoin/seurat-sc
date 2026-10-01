@@ -14,8 +14,8 @@
 | `INSTALL.md` | 3565 | `43417382250a` |
 | `LICENSE` | 1085 | `cc5041472d20` |
 | `NOTICE` | 2065 | `8af965a13d2a` |
-| `README.en.md` | 3880 | `f85831924302` |
-| `README.md` | 7235 | `86b70407b567` |
+| `README.en.md` | 3960 | `e644178f62f3` |
+| `README.md` | 7315 | `ebc425ee402b` |
 | `SKILL.md` | 18736 | `05e3c265b02c` |
 | `docs/assets/site.css` | 3256 | `e014a3dee1fe` |
 | `docs/es/index.html` | 4456 | `5a980b5000de` |
@@ -46,4 +46,4 @@
 | `tools/selftest.py` | 7244 | `d3e492e6c32a` |
 | `tools/whitelist.json` | 61023 | `99eae649ab7c` |
 
-**合计 41 个文件 / 364617 字节**
+**合计 41 个文件 / 364777 字节**

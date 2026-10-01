@@ -1,6 +1,6 @@
 # seurat-sc · Seurat v5 单细胞分析 Agent Skill
 
-> **English:** [README](README.en.md) · **中文:** 当前页面 · **Project site:** [English](docs/index.html) / [简体中文](docs/zh-cn/index.html) / [日本語](docs/ja/index.html) / [Español](docs/es/index.html)
+> **English:** [README](README.en.md) · **中文:** 当前页面 · **Project site:** [English](https://cndoin.github.io/seurat-sc/) / [简体中文](https://cndoin.github.io/seurat-sc/zh-cn/) / [日本語](https://cndoin.github.io/seurat-sc/ja/) / [Español](https://cndoin.github.io/seurat-sc/es/)
 
 给 AI Agent 用的 Seurat v5 技能包：让 Agent 写出的 R 代码**不出现幻觉函数、不出现幻觉参数**。
 

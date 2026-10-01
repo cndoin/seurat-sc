@@ -1,6 +1,6 @@
 # seurat-sc — Seurat v5 skill for AI agents
 
-> **English:** this page · **中文:** [README](README.md) · **Project site:** [English](docs/index.html) / [简体中文](docs/zh-cn/index.html) / [日本語](docs/ja/index.html) / [Español](docs/es/index.html)
+> **English:** this page · **中文:** [README](README.md) · **Project site:** [English](https://cndoin.github.io/seurat-sc/) / [简体中文](https://cndoin.github.io/seurat-sc/zh-cn/) / [日本語](https://cndoin.github.io/seurat-sc/ja/) / [Español](https://cndoin.github.io/seurat-sc/es/)
 
 `seurat-sc` helps AI coding agents write, check, plan, and troubleshoot R workflows for Seurat v5 single-cell and spatial transcriptomics. Its offline API catalog is generated from Seurat and SeuratObject source interfaces; `sc_lint.py` catches unknown functions, unsupported arguments, deprecated arguments, and common syntax issues before an R script is handed back.
 
