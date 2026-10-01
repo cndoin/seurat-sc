@@ -1,0 +1,25 @@
+# 事实底座重建时的下载/中间产物（可由 tools/etl/rebuild.py 重新生成）
+.build/
+raw/
+*.tmp
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# R
+.Rhistory
+.RData
+.Rproj.user/
+*.Rproj
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# 测试临时文件
+/tmp/

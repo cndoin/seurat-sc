@@ -1,0 +1,34 @@
+name: CI
+
+# seurat-sc 技能自检门禁。
+# 零第三方依赖、不需要 R：只跑 Python 3 标准库的 selftest.py。
+# 任何人 push / 提 PR 都会触发，保证事实底座与校验器不回归。
+
+on:
+  push:
+    branches: ["master", "main"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  selftest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run selftest
+        run: |
+          python3 tools/selftest.py
+          # 退出码契约：0 = 全部通过，非 0 直接让 CI 红
+          echo "selftest exit=$?"
+
+      - name: Lint the linter (dogfood)
+        run: |
+          # 用 sc_lint 校验脚本本身的 R 脚本（scripts/*.R）也干净
+          python3 tools/sc_lint.py scripts/preflight.R --json
+          python3 tools/sc_lint.py scripts/run_seurat.R --json
