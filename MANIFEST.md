@@ -14,14 +14,14 @@
 | `INSTALL.md` | 3565 | `43417382250a` |
 | `LICENSE` | 1085 | `cc5041472d20` |
 | `NOTICE` | 2065 | `8af965a13d2a` |
-| `README.en.md` | 3881 | `3b8636f7f669` |
+| `README.en.md` | 3880 | `f85831924302` |
 | `README.md` | 7235 | `86b70407b567` |
 | `SKILL.md` | 18736 | `05e3c265b02c` |
 | `docs/assets/site.css` | 3256 | `e014a3dee1fe` |
-| `docs/es/index.html` | 4465 | `bcdffc89f47d` |
-| `docs/index.html` | 4631 | `caee38a1f6af` |
-| `docs/ja/index.html` | 4952 | `e684f1f419df` |
-| `docs/zh-cn/index.html` | 4607 | `1d5ac964b789` |
+| `docs/es/index.html` | 4456 | `5a980b5000de` |
+| `docs/index.html` | 4622 | `8be0e26e4ae5` |
+| `docs/ja/index.html` | 4943 | `9e35aca7795d` |
+| `docs/zh-cn/index.html` | 4598 | `ce9e1084ca28` |
 | `install.py` | 3808 | `4d9075aead5e` |
 | `references/api-signatures.md` | 86676 | `23835e90e8d5` |
 | `references/environment.md` | 5405 | `94e82108a449` |
@@ -46,4 +46,4 @@
 | `tools/selftest.py` | 7244 | `d3e492e6c32a` |
 | `tools/whitelist.json` | 61023 | `99eae649ab7c` |
 
-**合计 41 个文件 / 364654 字节**
+**合计 41 个文件 / 364617 字节**

@@ -9,7 +9,7 @@
 Clone or download this repository, then run the installer with Python 3.7 or newer. The installer uses only the Python standard library.
 
 ```bash
-git clone https://github.com/<OWNER>/seurat-sc.git
+git clone https://github.com/cndoin/seurat-sc.git
 cd seurat-sc
 python3 install.py                 # Claude Code, user scope
 python3 install.py --project       # Claude Code, current project
