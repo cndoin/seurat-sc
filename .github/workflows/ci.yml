@@ -1,8 +1,14 @@
 name: CI
 
-# seurat-sc 技能自检门禁。
-# 零第三方依赖、不需要 R：只跑 Python 3 标准库的 selftest.py。
-# 任何人 push / 提 PR 都会触发，保证事实底座与校验器不回归。
+# seurat-sc 的自动门禁。零第三方依赖、不需要 R —— 只跑 Python 3 标准库的
+# selftest.py / sc_lint.py / negtest.py。
+#
+# 为什么要多平台矩阵：本技能的卖点之一是「零依赖、装到任何宿主都能跑」。
+# 只在 Linux 上跑证明不了这一点 —— Windows 的路径分隔符、换行、stdout 编码、
+# subprocess 行为都不同。所以矩阵必须覆盖三大平台。
+#
+# 为什么刻意不装任何依赖：装了反而掩盖「偷偷引入第三方依赖」的问题，
+# 那会直接破坏「装到任何宿主都能跑」这个承诺。
 
 on:
   push:
@@ -10,25 +16,104 @@ on:
   pull_request:
   workflow_dispatch:
 
+# 同一分支堆积的旧运行自动取消
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# 最小权限：本工作流只需要读代码
+permissions:
+  contents: read
+
 jobs:
   selftest:
-    runs-on: ubuntu-latest
+    name: gate (${{ matrix.os }} / py${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # 一个平台挂了，其它平台的结果仍然有价值 —— 不要互相取消
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.10", "3.13"]
+        exclude:
+          # 老版本只在 Linux 上跑，省 runner 时间
+          - os: windows-latest
+            python: "3.10"
+          - os: macos-latest
+            python: "3.10"
+    env:
+      # Windows runner 默认 stdout 编码是 cp936；统一成 UTF-8，
+      # 否则带中文的检查输出可能抛 UnicodeEncodeError（假红）。
+      PYTHONIOENCODING: utf-8
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python }}
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python }}
 
-      - name: Run selftest
-        run: |
-          python3 tools/selftest.py
-          # 退出码契约：0 = 全部通过，非 0 直接让 CI 红
-          echo "selftest exit=$?"
+      # 注：下面统一用 python（setup-python 在三大平台都提供）；
+      # 文档里写 python3 是给用户看的。
+      - name: Self-test (must exit 0)
+        shell: bash
+        run: python tools/selftest.py
 
       - name: Lint the linter (dogfood)
+        shell: bash
         run: |
-          # 用 sc_lint 校验脚本本身的 R 脚本（scripts/*.R）也干净
-          python3 tools/sc_lint.py scripts/preflight.R --json
-          python3 tools/sc_lint.py scripts/run_seurat.R --json
+          python tools/sc_lint.py scripts/preflight.R --json > /dev/null
+          python tools/sc_lint.py scripts/run_seurat.R --json > /dev/null
+
+      # 最关键的一步：证明门禁真的会失败。
+      # 一个永不失败的检查等于没有检查 —— 少了这一步，上面那些绿都是可疑的。
+      # negtest.py 对副本故意制造残缺（删 SKILL.md / 改错 name / 破坏 LICENSE …），
+      # 逐条断言对应门禁确实报错。
+      - name: Negative self-test (assert every gate actually fails)
+        shell: bash
+        run: python tools/negtest.py
+
+      - name: CLI and installer integration checks
+        shell: bash
+        run: python tools/integration_test.py
+
+      # 对外契约：--json 的 stdout 必须能被 json.loads 直接吃
+      - name: Assert --json is machine-readable
+        shell: bash
+        run: |
+          python tools/selftest.py --json 2>/dev/null > selftest.json
+          python -c "import json;d=json.load(open('selftest.json'));print('selftest total',d['total']);assert d['failed']==0"
+
+  r-runtime:
+    name: base-R runner and JSON checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: r-lib/actions/setup-r@v2
+      - run: python tools/integration_test.py --rscript Rscript
+
+  package:
+    name: package (dist artifacts are consistent)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      # pack.py 会重生成 MANIFEST.md 与 dist/*.zip|tar.gz。
+      # 若仓库里已提交的 MANIFEST 与当前文件树不一致，这一步会暴露漂移
+      #（前提是 pack.py 在把文件写回后确实会失败 —— 见下一条注释）。
+      - name: Repack and verify manifest has no drift
+        shell: bash
+        run: |
+          python tools/pack.py
+          git diff --stat -- MANIFEST.md
+          if ! git diff --quiet -- MANIFEST.md; then
+            echo "::error::MANIFEST.md 与当前文件树不一致 —— 请本地跑 python tools/pack.py 后一起提交"
+            git diff -- MANIFEST.md | head -40
+            exit 1
+          fi
+          echo "OK: MANIFEST.md 与文件树一致"

@@ -232,6 +232,9 @@ Rscript scripts/preflight.R --json
 Rscript scripts/run_seurat.R --script my_analysis.R --workdir runs/pbmc01
 ```
 
+> 注意：被包装脚本内 `commandArgs()` 拿到的是 run_seurat.R 自己的参数，
+> 给分析脚本传参请用环境变量（见 `references/pitfalls.md` 参数陷阱 9）。
+
 `sc_lint.py` 的退出码：0 = 无 error；1 = 有 error；2 = 用法错误。
 warning 不阻断（例如 deprecated 参数），但要在回复里说明。
 
@@ -259,7 +262,7 @@ warning 不阻断（例如 deprecated 参数），但要在回复里说明。
 
 ## 七、本机环境边界（诚实说明）
 
-Windows 上**当前未安装 R**（`which R` 无输出，已实测）。因此：
+每次任务先运行 `Rscript scripts/preflight.R --json` 检查当前环境；不要沿用技能作者机器的历史状态。如果当前机器没有可用 R：
 
 - 本技能在本机可以完整做到：**选函数、写代码、校验脚本、规划流程、解读报错**；
 - 本技能在本机**做不到**：真实跑 `Rscript` 出图出数。
@@ -302,5 +305,5 @@ Windows 上**当前未安装 R**（`which R` 无输出，已实测）。因此�
 2. 命令统一写 `python3`；Windows 上若没有 `python3`，把它换成 `python`。
 3. SKILL.md 是唯一常驻入口。`references/*.md` 按需 grep 读取，不要整篇加载
    （`api-signatures.md` 有 86 KB，整读既慢又挤占上下文）。
-4. 改动技能后必须跑 `python3 tools/selftest.py`（fixtures 回归 + 文档代码块 + 工具冒烟 + 数据完整性四类检查，全绿才能提交）；
+4. 改动技能后必须跑 `python3 tools/selftest.py`（fixtures 回归 + 文档代码块 + 工具冒烟 + 数据完整性 + 包完整性五类检查，全绿才能提交）；
    交付 R 代码前必须跑 `python3 tools/sc_lint.py <脚本>`（error 必须为 0）。

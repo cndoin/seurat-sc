@@ -43,6 +43,7 @@ workdir <- normalizePath(workdir, winslash = "/", mustWork = TRUE)
 esc <- function(s) {
   s <- gsub("\\\\", "\\\\\\\\", s)
   s <- gsub('"', '\\\\"', s)
+  for (code in 1:31) s <- gsub(intToUtf8(code), sprintf("\\u%04x", code), s, fixed = TRUE)
   s
 }
 jq <- function(s) paste0('"', esc(as.character(s)), '"')
@@ -69,7 +70,7 @@ w_handler <- function(w) {
 
 res <- withCallingHandlers(
   tryCatch({
-    source(script, echo = FALSE, local = FALSE)
+    source(script, echo = FALSE, local = new.env(parent = globalenv()))
     "ok"
   }, error = function(e) {
     errmsg <<- conditionMessage(e)
@@ -94,7 +95,7 @@ json <- sprintf('{
   "workdir": %s,
   "log": %s,
   "elapsed_sec": %s,
-  "warnings": %s,
+  "warnings": [%s],
   "warning_count": %d,
   "error": %s
 }',

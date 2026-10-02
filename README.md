@@ -1,6 +1,6 @@
 # seurat-sc · Seurat v5 单细胞分析 Agent Skill
 
-> **English:** [README](README.en.md) · **中文:** 当前页面 · **Project site:** [English](https://cndoin.github.io/seurat-sc/) / [简体中文](https://cndoin.github.io/seurat-sc/zh-cn/) / [日本語](https://cndoin.github.io/seurat-sc/ja/) / [Español](https://cndoin.github.io/seurat-sc/es/)
+> **English:** [README](README.en.md) · **项目主页:** [English](https://cndoin.github.io/seurat-sc/) / [简体中文](https://cndoin.github.io/seurat-sc/zh-cn/) / [日本語](https://cndoin.github.io/seurat-sc/ja/) / [Español](https://cndoin.github.io/seurat-sc/es/)
 
 给 AI Agent 用的 Seurat v5 技能包：让 Agent 写出的 R 代码**不出现幻觉函数、不出现幻觉参数**。
 
@@ -36,13 +36,19 @@ python3 install.py
 #   项目级:     python3 install.py --project
 
 # 2. 确认技能本身没坏
-python3 tools/selftest.py          # 全绿（fixtures+文档+工具+数据四类检查），退出码 0
+python3 tools/selftest.py          # 五类检查全绿，退出码 0
 
 # 3. 交付 R 代码前，必跑
 python3 tools/sc_lint.py my_analysis.R --json
+
+# 4. （可选）验证"门禁真的会拦" —— 对副本故意制造残缺，逐条断言门禁报错
+python3 tools/negtest.py           # 负向自测 15/15
 ```
 
 Windows 上若没有 `python3`，把命令里的 `python3` 换成 `python`。
+
+有 make 的话，上面这些都有别名：`make check` / `make lint` / `make pack`。
+Windows 原生没有 make —— `Makefile` 顶部注释里给了逐条等价命令。
 
 ## 三个工具
 
@@ -62,13 +68,19 @@ Windows 上若没有 `python3`，把命令里的 `python3` 换成 `python`。
 ```
 seurat-sc/
 ├── SKILL.md                  # Agent 的唯一常驻入口（决策路由 + 铁律 + 失败协议）
-├── install.py                # 跨平台安装到各 Agent 宿主
+├── install.py                # 跨平台安装（覆盖前自动备份 + 装完回验 + 裁掉仓库侧文件）
 ├── INSTALL.md                # 安装指南（Windows / macOS / Linux）
 ├── MANIFEST.md               # 文件清单 + SHA-256（由 pack.py 生成）
 ├── LICENSE                   # MIT
 ├── NOTICE                    # 上游归属与许可证声明
+├── SECURITY.md               # 安全政策 + 威胁模型（什么算本项目的漏洞）
 ├── CONTRIBUTING.md           # 改这个技能前必读
+├── CODE_OF_CONDUCT.md
 ├── CHANGELOG.md
+├── Makefile                  # 常用命令别名（Windows 无 make，文件内给了等价命令）
+├── .editorconfig             # 缩进策略
+├── .gitattributes            # 行尾策略（必须与 .editorconfig 配套，见 CONTRIBUTING）
+├── .github/                  # CI 多平台矩阵 + issue / PR 模板
 ├── references/
 │   ├── api-signatures.md     # 406 个符号的完整真实签名（86 KB，用 grep 查，别整读）
 │   ├── function-index.md     # 按模块 / S3 method / S4 类分类
@@ -82,7 +94,8 @@ seurat-sc/
 │   ├── sc_lint.py            # 核心校验器
 │   ├── sc_api.py             # 签名查询
 │   ├── sc_plan.py            # 流程规划
-│   ├── selftest.py           # 一键自检（fixtures+文档+工具+数据四类检查）
+│   ├── selftest.py           # 自检：五类检查（fixtures/文档/工具/数据/包完整性）
+│   ├── negtest.py            # 负向自测：证明每道门禁真的会失败
 │   ├── pack.py               # 打包成 zip + tar.gz，强制 LF、生成 MANIFEST
 │   ├── whitelist.json        # 事实底座（机器读）
 │   └── etl/                  # 事实底座的重建链路
@@ -126,6 +139,30 @@ python3 tools/etl/rebuild.py --ref v5.1.0   # 指定 Seurat 版本
 - **不能做**：在没有 R 的机器上真实执行 `Rscript` 出图出数。
   技能要求在这种情况下给用户三选一（本机装 R / 交服务器 / GitHub Actions），
   **并明确禁止假装跑过或编造任何数值结果**。
+
+## 质量怎么保证的
+
+这个技能存在的理由是拦住幻觉 API，所以它自己必须比被它检查的代码更可靠。
+四道机制：
+
+| 机制 | 命令 | 保证什么 |
+|---|---|---|
+| 正向自检 | `python3 tools/selftest.py` | 回归用例、文档代码块、工具行为、数据完整性、**包完整性**（SKILL.md / frontmatter / 许可证形态）五类全过，退出码 0 |
+| 负向自测 | `python3 tools/negtest.py` | 对副本故意制造残缺（删 SKILL.md、改错 name、破坏 LICENSE…），逐条断言门禁**真的报错** |
+| CI 矩阵 | `.github/workflows/ci.yml` | Linux / Windows / macOS × Python 3.10 / 3.13，**刻意不装任何依赖** |
+| 与上游对照 | `VERIFICATION.md` | 技能跑出的结果对官方 vignette 成品对象 ARI 0.9644、9 簇 1:1 映射 9 种经典细胞类型 |
+
+**为什么要有负向自测**：一个永不失败的检查等于没有检查。2026-10 的审计用
+15 个「制造残缺」用例测自检的检出率，发现旧版对「删掉 SKILL.md（技能唯一入口）、
+LICENSE、README、`scripts/*.R`，或把 frontmatter 的 `name` 改错、
+`description` 写到超 1024 字符」等 **9 种残缺状态一律返回 0**。
+补齐后固化成 `tools/negtest.py`，每次 CI 都跑。
+
+## 安全
+
+发现问题？请用 GitHub 的私密渠道报告（仓库 → Security → Report a vulnerability），
+不要开公开 issue。**什么算本项目的安全问题**（包括"校验器漏报"、
+"自检假绿"这类非传统漏洞）见 [`SECURITY.md`](SECURITY.md)。
 
 ## 许可证与归属
 

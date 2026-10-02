@@ -14,6 +14,7 @@ json_only <- "--json" %in% args
 esc <- function(s) {
   s <- gsub("\\\\", "\\\\\\\\", s)
   s <- gsub('"', '\\\\"', s)
+  for (code in 1:31) s <- gsub(intToUtf8(code), sprintf("\\u%04x", code), s, fixed = TRUE)
   s
 }
 jq <- function(s) paste0('"', esc(as.character(s)), '"')
@@ -96,16 +97,16 @@ cores <- tryCatch(parallel::detectCores(all.tests = FALSE, logical = TRUE),
                   error = function(e) NA)
 mem_gb <- tryCatch({
   if (Sys.info()[["sysname"]] == "Windows") {
-    as.numeric(memory.limit()) / 1024
+    NA_real_ # memory.limit() is unsupported in current R versions.
   } else if (file.exists("/proc/meminfo")) {
     l <- readLines("/proc/meminfo", n = 1, warn = FALSE)
-    as.numeric(strsplit(l, "\\s+")[[1]][3]) / 1024 / 1024
+    as.numeric(strsplit(trimws(l), "\\s+")[[1]][2]) / 1024 / 1024
   } else NA
 }, error = function(e) NA)
 
 wd <- getwd()
 wd_writable <- tryCatch({
-  tf <- file.path(wd, ".sc_preflight_write_test")
+  tf <- tempfile(pattern = ".sc_preflight_", tmpdir = wd)
   writeLines("ok", tf); unlink(tf); TRUE
 }, error = function(e) FALSE)
 
@@ -124,6 +125,11 @@ for (it in items) {
   }
 }
 if (!seurat_ok) hard_fail <- c(hard_fail, "未安装 Seurat：install.packages('Seurat')")
+for (it in items) {
+  if (isTRUE(it$required) && !isTRUE(it$installed) && it$name != "Seurat") {
+    hard_fail <- c(hard_fail, paste0("Missing required package: ", it$name))
+  }
+}
 if (!wd_writable) hard_fail <- c(hard_fail, paste0("工作目录不可写：", wd))
 
 # ---------- 输出 ----------
@@ -155,7 +161,7 @@ json <- sprintf('{
   if (seurat_ok) "true" else "false",
   jq(wd), if (wd_writable) "true" else "false",
   if (is.na(cores)) "null" else format(cores),
-  if (is.na(mem_gb)) "null" else format(round(mem_gb, 1)),
+  if (!is.finite(mem_gb)) "null" else format(round(mem_gb, 1)),
   jq(Sys.info()[["sysname"]]),
   pkg_json, issues_json)
 

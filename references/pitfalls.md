@@ -78,6 +78,20 @@
 8. **`subset()` 的过滤条件参数名就叫 `subset`：**
    `subset(obj, subset = nFeature_RNA > 200)`。写成 `subset(obj, nFeature_RNA > 200)` 会报错。
 
+9. **`run_seurat.R` 包装的脚本拿不到自己的命令行参数。**
+   `run_seurat.R` 用 `source()` 在同一 R 进程里执行脚本，脚本内
+   `commandArgs(trailingOnly = TRUE)` 拿到的是**包装器自己的参数**
+   （`--script` / `--workdir` / `--json`），不是给分析脚本的参数，
+   按位置取参会解析出垃圾值甚至直接报错。给分析脚本传参请用
+   环境变量（或写死在脚本里）：
+   `V_SEED=42 Rscript scripts/run_seurat.R --script a.R --workdir runs/x`，
+   脚本内以 `Sys.getenv("V_SEED")` 读取。
+
+10. **top marker 别只按 `avg_log2FC` 裸排序。** 实测 pct.1≈1.6% 的罕见
+    表达基因（如 GTSCR1）logFC 能冲到 7+，把 CD79A/MS4A1 这类经典 marker
+    挤出 top10。可解释的 marker 榜要按 `p_val` 排序并加 `pct.1 > 0.25`
+    过滤（见 `VERIFICATION.md` 生物学正确性一节的实测对照）。
+
 ---
 
 ## 四、性能与内存

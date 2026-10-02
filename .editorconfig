@@ -1,0 +1,29 @@
+root = true
+
+# 与 .gitattributes 配套：
+#   .gitattributes 管「git 怎么存」（* text=auto eol=lf）
+#   .editorconfig  管「编辑器怎么写」
+# 两者都要有，否则 Windows 上 git 的 autocrlf 会把 LF 转回 CRLF，diff 全是噪声。
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Markdown 行尾的两个空格是「硬换行」，不能被 trim 掉
+[*.md]
+trim_trailing_whitespace = false
+
+# R 脚本与 Python 工具统一 4 空格
+[*.{py,R,r}]
+indent_style = space
+indent_size = 4
+
+[*.{json,yml,yaml}]
+indent_style = space
+indent_size = 2
+
+# Makefile 必须用 tab —— 用空格会直接报 "missing separator"
+[Makefile]
+indent_style = tab
+indent_size = 4

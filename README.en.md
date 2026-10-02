@@ -51,6 +51,8 @@ python3 tools/sc_lint.py analysis.R --json
 
 Run `python3 tools/selftest.py` to check fixtures, documented R examples, CLI smoke cases, and catalog integrity. `python3 tools/etl/rebuild.py` regenerates the API catalog from upstream source and downloads source unless `--no-fetch` is used with a prepared `.build/` cache.
 
+The updated checks also validate package completeness. Run `python3 tools/negtest.py` to verify that broken copies are rejected, and `python3 tools/integration_test.py` to check CLI JSON and installation, including backups on `--force`. To check the optional R runner, add `--rscript Rscript` to the integration command. R runtime tests cover successful execution, warnings, errors, and valid JSON; they do not require Seurat. Consult `INSTALL.md` for platform-specific R setup.
+
 ## Compatibility and attribution
 
 This catalog snapshot was generated from Seurat `5.5.1.9005` and SeuratObject `5.0.2`. `NOTICE` describes upstream projects and attribution. `seurat-sc` is an independent MIT-licensed project and is not affiliated with or endorsed by Satija Lab. See [LICENSE](LICENSE).

@@ -59,7 +59,7 @@ def get(url, binary=False, timeout=120):
 
 def fetch_tarball(repo, ref, dest):
     """下载 repo 的 tarball 并解到 dest（dest 顶层即为仓库内容）。"""
-    url = "https://github.com/%s/archive/refs/heads/%s.tar.gz" % (repo, ref)
+    url = "https://api.github.com/repos/%s/tarball/%s" % (repo, ref)
     print("  downloading %s @ %s ..." % (repo, ref))
     try:
         blob = get(url, binary=True)
@@ -77,6 +77,11 @@ def fetch_tarball(repo, ref, dest):
                 os.rmdir(os.path.join(root, d))
     os.makedirs(tmp, exist_ok=True)
     with tarfile.open(fileobj=io.BytesIO(blob), mode="r:gz") as tf:
+        target = os.path.realpath(tmp)
+        for member in tf.getmembers():
+            resolved = os.path.realpath(os.path.join(target, member.name))
+            if os.path.commonpath([target, resolved]) != target or not (member.isfile() or member.isdir()):
+                raise ValueError("Unsafe archive member: %s" % member.name)
         tf.extractall(tmp)
     # 解出来是 <repo>-<ref>/ 单层目录，抬到 dest
     entries = os.listdir(tmp)
@@ -103,12 +108,10 @@ def fetch_so(dest):
     for f in ("DESCRIPTION", "NAMESPACE"):
         url = "https://raw.githubusercontent.com/%s/%s/%s" % (SO_REPO, SO_REF, f)
         p = os.path.join(dest, f)
-        if os.path.exists(p):
-            print("  skip %s (exists)" % f)
-            continue
         print("  downloading %s" % f)
+        content = get(url, binary=True)
         with io.open(p, "wb") as fh:
-            fh.write(get(url, binary=True))
+            fh.write(content)
 
     api = "https://api.github.com/repos/%s/contents/R?ref=%s" % (SO_REPO, SO_REF)
     print("  listing R/ via GitHub API ...")
@@ -119,10 +122,13 @@ def fetch_so(dest):
         if it.get("type") != "file" or not it["name"].endswith(".R"):
             continue
         p = os.path.join(rdir, it["name"])
-        if os.path.exists(p):
-            continue
+        content = get(it["download_url"], binary=True)
         with io.open(p, "wb") as fh:
-            fh.write(get(it["download_url"], binary=True))
+            fh.write(content)
+    expected = {it["name"] for it in items if it.get("type") == "file" and it["name"].endswith(".R")}
+    for name in os.listdir(rdir):
+        if name.endswith(".R") and name not in expected:
+            os.remove(os.path.join(rdir, name))
     print("  -> %s (%d R files)" % (dest, len(os.listdir(rdir))))
 
 

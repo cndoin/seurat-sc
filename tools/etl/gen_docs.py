@@ -8,8 +8,8 @@ import io, os, json, re
 
 _HERE = os.path.dirname(os.path.abspath(__file__))        # tools/etl
 SKILL = os.path.dirname(os.path.dirname(_HERE))           # skill 根目录
-RAW = os.path.abspath(os.environ.get(
-    "SEURAT_RAW", os.path.join(SKILL, ".build", "raw")))
+BUILD_DIR = os.path.abspath(os.environ.get("SEURAT_BUILD_DIR", os.path.join(SKILL, ".build")))
+RAW = os.path.abspath(os.environ.get("SEURAT_RAW", os.path.join(BUILD_DIR, "raw")))
 os.makedirs(os.path.join(SKILL, "references"), exist_ok=True)
 os.makedirs(os.path.join(SKILL, "tools"), exist_ok=True)
 os.makedirs(os.path.join(SKILL, "scripts"), exist_ok=True)
