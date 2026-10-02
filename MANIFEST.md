@@ -9,7 +9,7 @@
 | `.github/ISSUE_TEMPLATE/bug_report.md` | 1490 | `ab60fe34e23c` |
 | `.github/ISSUE_TEMPLATE/feature_request.md` | 1110 | `12f447c09984` |
 | `.github/PULL_REQUEST_TEMPLATE.md` | 1422 | `55e6ecafee50` |
-| `.github/workflows/ci.yml` | 4452 | `dec84b2a8f57` |
+| `.github/workflows/ci.yml` | 4469 | `edd5b59e11bc` |
 | `.github/workflows/pages.yml` | 628 | `f07bc81aaf16` |
 | `.gitignore` | 286 | `00f10d38b15c` |
 | `CHANGELOG.md` | 9881 | `f30c4ae5fc0f` |
@@ -21,7 +21,7 @@
 | `NOTICE` | 2198 | `439903965c67` |
 | `README.en.md` | 4440 | `90d66dd54e18` |
 | `README.md` | 9767 | `d2430e55e81c` |
-| `REVIEW-2026-10-02.md` | 3177 | `c70ce156c5af` |
+| `REVIEW-2026-10-02.md` | 3431 | `f380c007a31f` |
 | `SECURITY.md` | 4575 | `ceebee8f6b76` |
 | `SKILL.md` | 19019 | `b2e767849150` |
 | `VERIFICATION.md` | 8396 | `9623d3af09de` |
@@ -56,4 +56,4 @@
 | `tools/selftest.py` | 12245 | `ba207b92d5e3` |
 | `tools/whitelist.json` | 61023 | `99eae649ab7c` |
 
-**合计 51 个文件 / 431819 字节**
+**合计 51 个文件 / 432090 字节**

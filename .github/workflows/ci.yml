@@ -82,7 +82,7 @@ jobs:
         shell: bash
         run: |
           python tools/selftest.py --json 2>/dev/null > selftest.json
-          python -c "import json;d=json.load(open('selftest.json'));print('selftest total',d['total']);assert d['failed']==0"
+          python -c "import json;d=json.load(open('selftest.json',encoding='utf-8'));print('selftest total',d['total']);assert d['failed']==0"
 
   r-runtime:
     name: base-R runner and JSON checks
