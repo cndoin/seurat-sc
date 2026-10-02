@@ -45,6 +45,9 @@ def main():
         check(tool + " pure JSON", lambda tool=tool, extra=extra:
               json.loads(run([py, str(ROOT / "tools" / (tool + ".py"))] + extra + ["--json"]).stdout))
     with tempfile.TemporaryDirectory(prefix="seurat-integration-") as temp:
+        for helper in ("preflight.R", "run_seurat.R"):
+            check(helper + " static lint", lambda helper=helper: json.loads(run(
+                [py, str(ROOT / "tools/sc_lint.py"), str(ROOT / "scripts" / helper), "--json"]).stdout))
         base = Path(temp)
         def source_archive_checks():
             spec = importlib.util.spec_from_file_location("fetch_sources", ROOT / "tools/etl/fetch_sources.py")

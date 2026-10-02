@@ -21,7 +21,7 @@
 | `NOTICE` | 2198 | `439903965c67` |
 | `README.en.md` | 4440 | `90d66dd54e18` |
 | `README.md` | 9767 | `d2430e55e81c` |
-| `REVIEW-2026-10-02.md` | 3060 | `5cbfef918983` |
+| `REVIEW-2026-10-02.md` | 3177 | `c70ce156c5af` |
 | `SECURITY.md` | 4575 | `ceebee8f6b76` |
 | `SKILL.md` | 19019 | `b2e767849150` |
 | `VERIFICATION.md` | 8396 | `9623d3af09de` |
@@ -47,13 +47,13 @@
 | `tools/etl/fetch_sources.py` | 6240 | `da1fd64eb073` |
 | `tools/etl/gen_docs.py` | 13481 | `5e0eebbbe343` |
 | `tools/etl/rebuild.py` | 3242 | `72d84398f252` |
-| `tools/integration_test.py` | 6255 | `bb6fda91cc58` |
+| `tools/integration_test.py` | 6496 | `f1502ccebfcd` |
 | `tools/negtest.py` | 7760 | `bfa0691b0363` |
 | `tools/pack.py` | 3950 | `dfeac037b475` |
 | `tools/sc_api.py` | 4070 | `918724e32695` |
-| `tools/sc_lint.py` | 19422 | `ba389612b566` |
+| `tools/sc_lint.py` | 19516 | `fc59e7c973b4` |
 | `tools/sc_plan.py` | 13408 | `a29cf4ceadf3` |
 | `tools/selftest.py` | 12245 | `ba207b92d5e3` |
 | `tools/whitelist.json` | 61023 | `99eae649ab7c` |
 
-**合计 51 个文件 / 431367 字节**
+**合计 51 个文件 / 431819 字节**

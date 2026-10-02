@@ -21,6 +21,7 @@ WL_PATH = os.path.join(HERE, "whitelist.json")
 # ---------------------------------------------------------------- 基础放行表
 # base R / utils / stats / graphics / grDevices / methods 常用函数
 BASE_R = set("""
+intToUtf8 tempfile is.finite globalenv
 c list data.frame as.data.frame matrix as.matrix vector numeric character logical integer
 factor levels nlevels droplevels cut table prop.table xtabs aggregate by
 sum mean median sd var mad quantile range min max sum pmax pmin abs sqrt exp log log2 log10
@@ -307,7 +308,8 @@ def lint(path, wl, allow_unknown=False, strict=False):
                 and "PrepSCTFindMarkers" not in line:
             pass  # 由下面的 SCT 检查统一处理
 
-    used_seurat = any(n in symbols for n, _l, _a, _p in scan_calls(strip_code(raw)))
+    used_seurat = any(n in symbols and n not in BASE_R and not pkg
+                      for n, _l, _a, pkg in scan_calls(strip_code(raw)))
     if used_seurat and not re.search(r"^\s*(library|require)\s*\(\s*['\"]?Seurat['\"]?\s*\)", raw, re.M):
         warnings.append({"line": 0, "code": "no-library",
                          "msg": "脚本用了 Seurat 函数但没有 library(Seurat)，确认是否已加载"})
